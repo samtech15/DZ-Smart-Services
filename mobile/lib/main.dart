@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController accountController = TextEditingController();
   final TextEditingController keyController = TextEditingController();
   final TextEditingController transferController = TextEditingController();
-  static const categories = ['الكل','البريد وCCP','الحسابات والحسابات','الحسابات','الاتصالات','الفواتير','بوابات رقمية','الإدارة والوثائق','العمل والضمان','التعليم','السكن','المالية','الأعمال والتجارة','الصحة','النقل','مواقع عامة'];
+  static const categories = ['الكل','البريد وCCP','الاتصالات','الفواتير','بوابات رقمية','الإدارة والوثائق','العمل والضمان','التعليم','السكن','المالية','الأعمال والتجارة','الصحة','النقل','مواقع عامة'];
 
   @override
   void initState() { super.initState(); _loadFavorites(); }
@@ -139,9 +139,13 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: widget.dark ? const Color(0xFF17191F) : Colors.white,
         title: const Text('Dz Service', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: .3)),
         centerTitle: true,
-        leading: IconButton(onPressed: widget.onTheme, icon: Icon(widget.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined)),
-        actions: [IconButton(onPressed: () => _showAbout(), icon: const Icon(Icons.more_vert))],
+        leading: Builder(builder: (ctx) => IconButton(onPressed: () => Scaffold.of(ctx).openDrawer(), icon: const Icon(Icons.menu_rounded))),
+        actions: [
+          IconButton(onPressed: () => showSearch(context: context, delegate: _ServiceSearchDelegate((s) => _open(s.url))), icon: const Icon(Icons.search_rounded)),
+          IconButton(onPressed: widget.onTheme, icon: Icon(widget.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined)),
+        ],
       ),
+      drawer: _appDrawer(),
       body: SafeArea(child: Column(children: [
         if (tab == 0) _brandBanner(),
         Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 8), child: TextField(
@@ -179,6 +183,28 @@ class _HomePageState extends State<HomePage> {
       ]),
     ));
   }
+
+  Widget _appDrawer() => Drawer(child: SafeArea(child: Column(children: [
+    Container(width: double.infinity, padding: const EdgeInsets.fromLTRB(20, 28, 20, 22), decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF075E61), Color(0xFF10233B)])), child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      CircleAvatar(radius: 29, backgroundColor: Color(0xFFFFB21A), child: Icon(Icons.account_balance_rounded, color: Color(0xFF10233B), size: 30)),
+      SizedBox(height: 12), Text('Dz Service', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+      Text('تطوير سامر عبد النور', style: TextStyle(color: Colors.white70)),
+      Text('خدمات الجزائر في مكان واحد', style: TextStyle(color: Colors.white70, fontSize: 12)),
+    ])),
+    Expanded(child: ListView(children: [
+      _drawerItem(Icons.person_outline, 'رقم حسابي الشخصي', () { Navigator.pop(context); _ripDialog(); }),
+      _drawerItem(Icons.bookmark_outline, 'حسابات CCP المحفوظة', () { Navigator.pop(context); _message('لا تحفظ كلمات المرور أو مفاتيح CCP داخل التطبيق حفاظاً على أمانك.'); }),
+      _drawerItem(Icons.forum_outlined, 'منتدى الأسئلة', () { Navigator.pop(context); _message('سيتم إضافة قسم الأسئلة الشائعة في تحديث قادم.'); }),
+      _drawerItem(Icons.notifications_none, 'التذكيرات والإشعارات', () { Navigator.pop(context); _message('التنبيهات المحلية قيد التطوير.'); }),
+      _drawerItem(Icons.info_outline, 'حول التطبيق', () { Navigator.pop(context); _showAbout(); }),
+      _drawerItem(Icons.shield_outlined, 'استشارة خاصة', () { Navigator.pop(context); _message('لا ترسل بياناتك البنكية أو رموز التحقق لأي شخص.'); }),
+      _drawerItem(Icons.settings_outlined, 'الإعدادات والمظهر', () { Navigator.pop(context); widget.onTheme(); }),
+      const Divider(height: 28),
+      Padding(padding: const EdgeInsets.all(16), child: Text('أدوات وخدمات Dz Service', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
+    ])),
+    const Padding(padding: EdgeInsets.all(14), child: Text('Dz Service • سامر عبد النور', style: TextStyle(color: Colors.grey, fontSize: 11))),
+  ])));
+  Widget _drawerItem(IconData icon, String title, VoidCallback action) => ListTile(leading: Icon(icon, color: teal), title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)), trailing: const Icon(Icons.chevron_left), onTap: action);
 
   Widget _brandBanner() => Container(
     margin: const EdgeInsets.fromLTRB(14, 12, 14, 5), padding: const EdgeInsets.all(19),
@@ -223,7 +249,7 @@ class _HomePageState extends State<HomePage> {
   Widget _serviceTile(Service s) {
     final fav = favorites.contains(s.title);
     return Container(margin: const EdgeInsets.only(bottom: 9), decoration: BoxDecoration(color: tile, borderRadius: BorderRadius.circular(19), border: Border.all(color: ink.withValues(alpha: .06))),
-      child: ListTile(contentPadding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), leading: Container(width: 47, height: 47, decoration: BoxDecoration(color: teal.withValues(alpha: .13), borderRadius: BorderRadius.circular(14)), child: Icon(s.icon, color: teal)), title: Text(s.title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)), subtitle: Text(s.subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11)), trailing: SizedBox(width: 78, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      child: ListTile(contentPadding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), leading: Container(width: 54, height: 54, decoration: BoxDecoration(color: teal.withValues(alpha: .13), borderRadius: BorderRadius.circular(15)), child: Icon(s.icon, color: teal, size: 27)), title: Text(s.title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)), subtitle: Text(s.subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11)), trailing: SizedBox(width: 78, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(visualDensity: VisualDensity.compact, onPressed: () => _favorite(s), icon: Icon(fav ? Icons.bookmark : Icons.bookmark_border, color: fav ? amber : Colors.grey)),
         const Icon(Icons.chevron_left, color: Colors.blueGrey),
       ])), onTap: () => _open(s.url)),
@@ -258,5 +284,5 @@ class _HomePageState extends State<HomePage> {
       const SizedBox(height: 10), TextField(controller: transferController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'المبلغ بالدينار', border: OutlineInputBorder())),
     ]), actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إغلاق')), FilledButton(onPressed: () { final v = int.tryParse(transferController.text); Navigator.pop(ctx); _message(v == null ? 'أدخل مبلغاً صحيحاً.' : 'المبلغ المدخل: $v دج'); }, child: const Text('تحقق'))]));
   }
-  void _showAbout() => showAboutDialog(context: context, applicationName: 'Dz Service', applicationVersion: '2.2.0', applicationLegalese: 'تطوير سامر عبد النور', children: const [Text('تطبيق مستقل يجمع روابط الخدمات العامة وأدوات مساعدة. ليس تابعاً لبريد الجزائر أو لأي جهة حكومية. لا تدخل كلمات المرور أو رموز OTP أو بيانات البطاقة داخل التطبيق.')]);
+  void _showAbout() => showAboutDialog(context: context, applicationName: 'Dz Service', applicationVersion: '3.0.0', applicationLegalese: 'تطوير سامر عبد النور', children: const [Text('تطبيق مستقل يجمع روابط الخدمات العامة وأدوات مساعدة. ليس تابعاً لبريد الجزائر أو لأي جهة حكومية. لا تدخل كلمات المرور أو رموز OTP أو بيانات البطاقة داخل التطبيق.')]);
 }
