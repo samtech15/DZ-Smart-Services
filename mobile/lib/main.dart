@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
     final list = serviceItems.where((s) {
       final q = search.trim().toLowerCase();
       return (category == 'الكل' || s.category == category) &&
-        (tab != 2 || favorites.contains(s.title)) &&
+        (tab != 3 || favorites.contains(s.title)) &&
         ('${s.title} ${s.subtitle} ${s.category}'.toLowerCase().contains(q));
     }).toList();
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
           onChanged: (v) => setState(() => search = v),
           decoration: InputDecoration(hintText: 'ابحث عن خدمة أو عملية...', prefixIcon: const Icon(Icons.search), filled: true, fillColor: tile, border: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: BorderSide.none)),
         )),
-        if (tab != 2)
+        if (tab != 3)
           SizedBox(
             height: 44,
             child: ListView(
@@ -171,14 +171,15 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-        Expanded(child: tab == 1 && search.isEmpty && category == 'الكل' ? _toolsAndServices() : list.isEmpty ? _empty() : ListView(padding: const EdgeInsets.fromLTRB(14, 8, 14, 18), children: [
-          _heading(tab == 2 ? 'المفضلة' : 'الخدمات المتاحة', '${list.length} خدمة'),
+        Expanded(child: tab == 2 && search.isEmpty && category == 'الكل' ? _toolsAndServices() : list.isEmpty ? _empty() : ListView(padding: const EdgeInsets.fromLTRB(14, 8, 14, 18), children: [
+          _heading(tab == 3 ? 'المفضلة' : tab == 1 ? 'الأقسام والخدمات' : 'الخدمات المتاحة', '${list.length} خدمة'),
           ...list.map(_serviceTile),
         ])),
       ])),
       bottomNavigationBar: NavigationBar(selectedIndex: tab, onDestinationSelected: (v) => setState(() { tab = v; search = ''; category = 'الكل'; }), destinations: const [
         NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'الرئيسية'),
         NavigationDestination(icon: Icon(Icons.apps), label: 'الأقسام'),
+        NavigationDestination(icon: Icon(Icons.calculate_outlined), label: 'الأدوات'),
         NavigationDestination(icon: Icon(Icons.bookmark_border), selectedIcon: Icon(Icons.bookmark), label: 'المفضلة'),
       ]),
     ));
@@ -186,7 +187,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _appDrawer() => Drawer(child: SafeArea(child: Column(children: [
     Container(width: double.infinity, padding: const EdgeInsets.fromLTRB(20, 28, 20, 22), decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF075E61), Color(0xFF10233B)])), child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      CircleAvatar(radius: 29, backgroundColor: Color(0xFFFFB21A), child: Icon(Icons.account_balance_rounded, color: Color(0xFF10233B), size: 30)),
+      DzServiceLogo(size: 66),
       SizedBox(height: 12), Text('Dz Service', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
       Text('تطوير سامر عبد النور', style: TextStyle(color: Colors.white70)),
       Text('خدمات الجزائر في مكان واحد', style: TextStyle(color: Colors.white70, fontSize: 12)),
@@ -210,7 +211,7 @@ class _HomePageState extends State<HomePage> {
     margin: const EdgeInsets.fromLTRB(14, 12, 14, 5), padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF006C70), Color(0xFF008E83), Color(0xFF064E63)], begin: Alignment.topRight, end: Alignment.bottomLeft), borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: teal.withValues(alpha: .2), blurRadius: 18, offset: const Offset(0, 7))]),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [const Icon(Icons.public, color: Colors.white, size: 26), const SizedBox(width: 9), const Text('DZ • ALGERIA', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, letterSpacing: 1.4)), const Spacer(), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: amber, borderRadius: BorderRadius.circular(20)), child: const Text('خدماتك في مكان واحد', style: TextStyle(color: navy, fontSize: 10, fontWeight: FontWeight.w900)))]),
+      Row(children: [const DzServiceLogo(size: 62), const SizedBox(width: 12), const Expanded(child: Text('DZ • ALGERIA', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, letterSpacing: 1.4)),), const Spacer(), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: amber, borderRadius: BorderRadius.circular(20)), child: const Text('خدماتك في مكان واحد', style: TextStyle(color: navy, fontSize: 10, fontWeight: FontWeight.w900)))]),
       const SizedBox(height: 15),
       const Text('كل خدمات الجزائر،\nبسهولة وفي مكان واحد', style: TextStyle(color: Colors.white, fontSize: 25, height: 1.25, fontWeight: FontWeight.w900)),
       const SizedBox(height: 7),
@@ -337,4 +338,34 @@ class _ServiceSearchDelegate extends SearchDelegate<Service?> {
       },
     );
   }
+}
+
+
+class DzServiceLogo extends StatelessWidget {
+  final double size;
+  const DzServiceLogo({super.key, this.size = 64});
+  @override
+  Widget build(BuildContext context) => SizedBox(width: size, height: size, child: CustomPaint(painter: _DzServiceLogoPainter()));
+}
+class _DzServiceLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = Offset.zero & size;
+    final bg = Paint()..shader = const LinearGradient(colors: [Color(0xFF06253B), Color(0xFF087F78), Color(0xFF101827)], begin: Alignment.topLeft, end: Alignment.bottomRight).createShader(r);
+    canvas.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(size.width * .24)), bg);
+    canvas.drawRRect(RRect.fromRectAndRadius(r.deflate(size.width*.025), Radius.circular(size.width*.22)), Paint()..style=PaintingStyle.stroke..strokeWidth=size.width*.035..color=Color(0xFFFFB21A));
+    final d = Paint()..style=PaintingStyle.stroke..strokeWidth=size.width*.12..strokeCap=StrokeCap.square..color=Colors.white;
+    final p=Path()..moveTo(size.width*.34,size.height*.23)..lineTo(size.width*.34,size.height*.77)..lineTo(size.width*.53,size.height*.77)..cubicTo(size.width*.88,size.height*.77,size.width*.88,size.height*.23,size.width*.53,size.height*.23);
+    canvas.drawPath(p,d);
+    canvas.drawArc(Rect.fromCenter(center:r.center,width:size.width*.84,height:size.height*.48),.15,2.8,false,Paint()..style=PaintingStyle.stroke..strokeWidth=size.width*.045..color=Color(0xFFFFB21A));
+    final circuit=Paint()..color=Color(0xFF00D0B0)..strokeWidth=size.width*.025;
+    for(final y in [.40,.55,.70]) {
+      canvas.drawCircle(Offset(size.width*.18,size.height*y),size.width*.035,circuit);
+      canvas.drawLine(Offset(size.width*.22,size.height*y),Offset(size.width*.36,size.height*y),circuit);
+    }
+    final star=Path()..moveTo(size.width*.72,size.height*.10)..lineTo(size.width*.75,size.height*.18)..lineTo(size.width*.84,size.height*.19)..lineTo(size.width*.77,size.height*.25)..lineTo(size.width*.79,size.height*.34)..lineTo(size.width*.71,size.height*.29)..lineTo(size.width*.64,size.height*.34)..lineTo(size.width*.66,size.height*.25)..lineTo(size.width*.59,size.height*.19)..lineTo(size.width*.69,size.height*.18)..close();
+    canvas.drawPath(star,Paint()..color=Color(0xFFFFB21A));
+  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate)=>false;
 }
