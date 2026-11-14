@@ -1,0 +1,28 @@
+name: Build Android APK
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/android-apk.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Create Android project wrapper
+        run: |
+          cd mobile
+          flutter create --platforms=android --org dz.smartservices .
+      - name: Get dependencies
+        run: cd mobile && flutter pub get
+      - name: Build APK
+        run: cd mobile && flutter build apk --release
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dz-smart-services-android
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
