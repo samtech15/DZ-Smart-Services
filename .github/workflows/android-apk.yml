@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Dz Service Android APK
 
 on:
   workflow_dispatch:
@@ -34,6 +34,13 @@ jobs:
         working-directory: mobile
         run: flutter create --platforms=android --org dz.smartservices .
 
+      - name: Generate Dz Service launcher icon and app name
+        working-directory: mobile
+        run: |
+          python -m pip install --quiet Pillow
+          python tooling/create_app_icon.py
+          sed -i 's/android:label="dz_smart_services"/android:label="Dz Service"/' android/app/src/main/AndroidManifest.xml
+
       - name: Install dependencies
         working-directory: mobile
         run: flutter pub get
@@ -45,7 +52,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DZ-Smart-Services-APK
+          name: Dz-Service-APK
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 14
