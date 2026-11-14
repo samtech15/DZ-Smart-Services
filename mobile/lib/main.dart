@@ -148,7 +148,25 @@ class _HomePageState extends State<HomePage> {
           onChanged: (v) => setState(() => search = v),
           decoration: InputDecoration(hintText: 'ابحث عن خدمة أو عملية...', prefixIcon: const Icon(Icons.search), filled: true, fillColor: tile, border: OutlineInputBorder(borderRadius: BorderRadius.circular(17), borderSide: BorderSide.none)),
         )),
-        if (tab != 2) SizedBox(height: 44, child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 12), children: categories.map((c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 3), child: ChoiceChip(label: Text(c), selected: category == c, onSelected: (_) => setState(() => category = c))).toList())),
+        if (tab != 2)
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: [
+                for (final c in categories)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: ChoiceChip(
+                      label: Text(c),
+                      selected: category == c,
+                      onSelected: (_) => setState(() => category = c),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         Expanded(child: tab == 1 && search.isEmpty && category == 'الكل' ? _toolsAndServices() : list.isEmpty ? _empty() : ListView(padding: const EdgeInsets.fromLTRB(14, 8, 14, 18), children: [
           _heading(tab == 2 ? 'المفضلة' : 'الخدمات المتاحة', '${list.length} خدمة'),
           ...list.map(_serviceTile),
