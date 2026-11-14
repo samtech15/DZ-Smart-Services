@@ -1,28 +1,51 @@
 name: Build Android APK
+
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'mobile/**'
       - '.github/workflows/android-apk.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Build release APK
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - name: Create Android project wrapper
-        run: |
-          cd mobile
-          flutter create --platforms=android --org dz.smartservices .
-      - name: Get dependencies
-        run: cd mobile && flutter pub get
+          cache: true
+
+      - name: Generate Android platform files
+        working-directory: mobile
+        run: flutter create --platforms=android --org dz.smartservices .
+
+      - name: Install dependencies
+        working-directory: mobile
+        run: flutter pub get
+
       - name: Build APK
-        run: cd mobile && flutter build apk --release
-      - name: Upload APK artifact
+        working-directory: mobile
+        run: flutter build apk --release
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: dz-smart-services-android
+          name: DZ-Smart-Services-APK
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
