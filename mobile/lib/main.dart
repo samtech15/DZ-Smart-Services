@@ -286,3 +286,55 @@ class _HomePageState extends State<HomePage> {
   }
   void _showAbout() => showAboutDialog(context: context, applicationName: 'Dz Service', applicationVersion: '3.0.0', applicationLegalese: 'تطوير سامر عبد النور', children: const [Text('تطبيق مستقل يجمع روابط الخدمات العامة وأدوات مساعدة. ليس تابعاً لبريد الجزائر أو لأي جهة حكومية. لا تدخل كلمات المرور أو رموز OTP أو بيانات البطاقة داخل التطبيق.')]);
 }
+
+
+class _ServiceSearchDelegate extends SearchDelegate<Service?> {
+  final ValueChanged<Service> onOpen;
+  _ServiceSearchDelegate(this.onOpen);
+
+  @override
+  String get searchFieldLabel => 'ابحث عن خدمة...';
+
+  @override
+  List<Widget> buildActions(BuildContext context) => [
+    IconButton(icon: const Icon(Icons.close), onPressed: () => query = ''),
+  ];
+
+  @override
+  Widget buildLeading(BuildContext context) => IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => close(context, null),
+  );
+
+  @override
+  Widget buildResults(BuildContext context) => _results(context);
+
+  @override
+  Widget buildSuggestions(BuildContext context) => _results(context);
+
+  Widget _results(BuildContext context) {
+    final q = query.trim().toLowerCase();
+    final matches = serviceItems.where((s) =>
+      q.isEmpty || ('${s.title} ${s.subtitle} ${s.category}'.toLowerCase().contains(q))
+    ).toList();
+    if (matches.isEmpty) {
+      return const Center(child: Text('لا توجد نتائج'));
+    }
+    return ListView.builder(
+      itemCount: matches.length,
+      itemBuilder: (context, index) {
+        final s = matches[index];
+        return ListTile(
+          leading: Icon(s.icon, color: teal),
+          title: Text(s.title),
+          subtitle: Text(s.subtitle),
+          trailing: const Icon(Icons.chevron_left),
+          onTap: () {
+            close(context, s);
+            onOpen(s);
+          },
+        );
+      },
+    );
+  }
+}
