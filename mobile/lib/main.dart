@@ -31,6 +31,17 @@ S('سونلغاز','الكهرباء والغاز وخدمات الزبائن','
 S('الجزائرية للمياه','المياه والفواتير','فواتير','https://www.ade.dz/',Icons.water_drop),
 S('SNTF','القطارات والتنقل','نقل','https://www.sntf.dz/',Icons.train),
 S('الخطوط الجوية الجزائرية','الرحلات والحجز','نقل','https://airalgerie.dz/',Icons.flight),
+S('DZDS — البوابة الوطنية','الدخول المباشر إلى البوابة الوطنية للخدمات الرقمية','إداري','https://dzds.dz/',Icons.hub,tag:'بوابة وطنية رسمية'),
+S('جواز السفر البيومتري','بوابة خدمات جواز السفر','إداري','https://passeport.interieur.gov.dz/',Icons.travel_explore),
+S('وزارة الشؤون الخارجية','الخدمات القنصلية والشؤون الخارجية','إداري','https://www.mfa.gov.dz/',Icons.public),
+S('وزارة التجارة','حماية المستهلك والسجل التجاري والتجارة','تجارة','https://www.commerce.gov.dz/',Icons.store),
+S('السجل التجاري Sidjilcom','خدمات المركز الوطني للسجل التجاري','تجارة','https://sidjilcom.cnrc.dz/',Icons.business),
+S('جبايتك Jibayatic','الخدمات والتصريح الجبائي عن بعد','مالية','https://jibayatic.mf.gov.dz/',Icons.receipt_long),
+S('الرقم التعريفي الجبائي','خدمات التعريف الجبائي','مالية','https://nifenligne.mf.gov.dz/',Icons.numbers),
+S('الجمارك الجزائرية','الخدمات والمعلومات الجمركية','تجارة','https://www.douane.gov.dz/',Icons.local_shipping),
+S('وزارة الصحة','الأخبار والخدمات الصحية الرسمية','صحة','https://www.sante.gov.dz/',Icons.local_hospital),
+S('وزارة التكوين المهني','التكوين والتسجيلات المهنية','تعليم','https://www.mfep.gov.dz/',Icons.school),
+S('وكالة الأنباء الجزائرية APS','الأخبار الوطنية','مواقع عامة','https://www.aps.dz/',Icons.newspaper),
 ];
 class DZApp extends StatefulWidget{const DZApp({super.key});@override State<DZApp> createState()=>_DZAppState();}
 class _DZAppState extends State<DZApp>{ThemeMode mode=ThemeMode.light;@override Widget build(BuildContext c)=>MaterialApp(debugShowCheckedModeBanner:false,title:'DZ Smart Services',themeMode:mode,theme:ThemeData(useMaterial3:true,colorScheme:ColorScheme.fromSeed(seedColor:forest),scaffoldBackgroundColor:const Color(0xFFF5F7F4)),darkTheme:ThemeData(useMaterial3:true,brightness:Brightness.dark,colorScheme:ColorScheme.fromSeed(seedColor:forest,brightness:Brightness.dark)),home:Hub(toggle:()=>setState(()=>mode=mode==ThemeMode.dark?ThemeMode.light:ThemeMode.dark),dark:mode==ThemeMode.dark));}
